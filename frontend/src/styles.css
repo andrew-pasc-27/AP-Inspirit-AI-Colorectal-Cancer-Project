@@ -1,0 +1,61 @@
+/* Responsive helpers */
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.home-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1.25rem;
+}
+
+/* Portrait / narrow screens → single column, tighter padding */
+@media (max-width: 900px), (orientation: portrait) {
+  .two-col {
+    grid-template-columns: 1fr !important;
+  }
+  .app-main {
+    padding: 1rem !important;
+    padding-top: 4.25rem !important;
+  }
+  .home-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .twin-viewer {
+    height: 360px !important;
+  }
+  .doctor-page {
+    height: auto !important;
+    min-height: calc(100vh - 5.5rem);
+  }
+  .quick-questions {
+    flex-wrap: nowrap !important;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 0.25rem;
+  }
+  .quick-questions button {
+    flex: 0 0 auto;
+  }
+  .hero-title {
+    font-size: 30px !important;
+  }
+}
+
+/* Sidebar slide animation */
+.sidebar {
+  transition: width 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-up { animation: fadeUp 0.35s ease both; }
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}

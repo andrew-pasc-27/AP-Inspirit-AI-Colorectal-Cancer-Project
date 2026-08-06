@@ -1,0 +1,15 @@
+fastapi
+uvicorn[standard]
+python-multipart
+tensorflow
+numpy
+Pillow
+huggingface_hub
+fastapi
+huggingface_hub
+numpy
+pillow
+pydantic
+python-multipart
+tensorflow
+uvicorn[standard]

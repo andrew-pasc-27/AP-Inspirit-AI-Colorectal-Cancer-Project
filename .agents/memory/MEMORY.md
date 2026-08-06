@@ -1,0 +1,1 @@
+- [Three.js / R3F frontend](three-js-frontend.md) — use fiber v8 + drei v9 for React 18; guard 3D pages against WebGL-less screenshot sandbox (preflight check + error boundary).
