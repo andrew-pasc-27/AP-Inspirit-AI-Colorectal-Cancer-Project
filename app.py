@@ -15,17 +15,46 @@ import numpy as np
 from PIL import Image
 import uvicorn
 
-# ── model loading ────────────────────────────────────────────────────────────
+# ── model loading (lazy + background) ─────────────────────────────────────────
+# The Keras/TensorFlow model is ~94MB and takes 20+ seconds to import + load.
+# Loading it at import time delays the port from opening, which makes the
+# deployment healthcheck time out ("port never opened"). Instead we load
+# CLASS_NAMES cheaply at import and load the model in a background thread once
+# the server is up, so port 5000 binds immediately and healthchecks pass.
+import threading
 import model_setup, helpers
 
-print("Loading Keras model …")
-import tensorflow as tf
-MODEL = tf.keras.models.load_model(model_setup.paths["model_precision_medicine.keras"])
 CLASS_NAMES: list[str] = json.load(open(model_setup.paths["class_names.json"]))
-print("Model loaded. Classes:", CLASS_NAMES)
+
+MODEL = None
+_MODEL_LOCK = threading.Lock()
+
+
+def get_model():
+    """Return the loaded model, loading it (once) on first use if needed."""
+    global MODEL
+    if MODEL is not None:
+        return MODEL
+    with _MODEL_LOCK:
+        if MODEL is None:
+            print("Loading Keras model …")
+            import tensorflow as tf
+            MODEL = tf.keras.models.load_model(
+                model_setup.paths["model_precision_medicine.keras"]
+            )
+            print("Model loaded. Classes:", CLASS_NAMES)
+    return MODEL
 
 # ── app ──────────────────────────────────────────────────────────────────────
 app = FastAPI(title="Colorectal Cancer Colleague")
+
+
+@app.on_event("startup")
+def _preload_model():
+    # Warm the model in a background thread so the port opens immediately and
+    # the first real prediction isn't slow. Prediction still works before this
+    # finishes because get_model() loads on demand under a lock.
+    threading.Thread(target=get_model, daemon=True).start()
 
 app.add_middleware(
     CORSMiddleware,
@@ -390,7 +419,7 @@ async def predict(file: UploadFile = File(...)):
     except Exception:
         raise HTTPException(status_code=400, detail="Invalid or unreadable image file.")
     try:
-        label, scores = helpers.predict(MODEL, image, CLASS_NAMES)
+        label, scores = helpers.predict(get_model(), image, CLASS_NAMES)
         info = TISSUE_INFO.get(label, {})
         return {
             "prediction": label,

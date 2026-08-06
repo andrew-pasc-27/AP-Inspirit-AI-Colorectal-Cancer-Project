@@ -1,1 +1,2 @@
 - [Three.js / R3F frontend](three-js-frontend.md) — use fiber v8 + drei v9 for React 18; guard 3D pages against WebGL-less screenshot sandbox (preflight check + error boundary).
+- [Deployment model loading](deployment-model-loading.md) — load the heavy Keras/TF model lazily in a background thread, not at import; keep `/` cheap or the deploy healthcheck times out on "port never opened".
