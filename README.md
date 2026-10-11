@@ -71,9 +71,6 @@ This project gave me experience with training and evaluating neural networks, wo
 
 One of the biggest takeaways was that building a model involves more than just achieving a high score. Choosing the right approach, evaluating results carefully, and understanding the model's limitations are all important.
 
-## Limitations
-
-This project is an educational prototype, not a medical diagnostic tool. Its results do not establish that it can reliably classify samples from different hospitals or be used to make clinical decisions.
 
 ## Acknowledgments
 
